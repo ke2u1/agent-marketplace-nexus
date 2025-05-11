@@ -1,10 +1,34 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, LogOut, Settings } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const email = user.email || "";
+    return email.substring(0, 1).toUpperCase();
+  };
 
   return (
     <nav className="bg-white shadow-sm">
@@ -27,6 +51,9 @@ const Navbar = () => {
               <Link to="/categories" className="text-gray-600 hover:text-marketplace-primary transition-colors">
                 Categories
               </Link>
+              <Link to="/pricing" className="text-gray-600 hover:text-marketplace-primary transition-colors">
+                Pricing
+              </Link>
               <Link to="/about" className="text-gray-600 hover:text-marketplace-primary transition-colors">
                 About
               </Link>
@@ -34,16 +61,47 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="outline" className="border-marketplace-primary text-marketplace-primary">
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-marketplace-secondary hover:bg-opacity-90 text-white">
-                Sign Up
-              </Button>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" className="border-marketplace-primary text-marketplace-primary">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button className="bg-marketplace-secondary hover:bg-opacity-90 text-white">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="md:hidden">
@@ -96,24 +154,59 @@ const Navbar = () => {
                 Categories
               </Link>
               <Link
+                to="/pricing"
+                className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              <Link
                 to="/about"
                 className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
-              <div className="flex space-x-2 pt-2">
-                <Link to="/login" className="w-1/2" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full border-marketplace-primary text-marketplace-primary">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup" className="w-1/2" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-marketplace-secondary hover:bg-opacity-90 text-white">
-                    Sign Up
-                  </Button>
-                </Link>
-              </div>
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard/profile"
+                    className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                    className="px-2 py-1 text-red-600 hover:text-red-800 transition-colors text-left"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <div className="flex space-x-2 pt-2">
+                  <Link to="/login" className="w-1/2" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-marketplace-primary text-marketplace-primary">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup" className="w-1/2" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-marketplace-secondary hover:bg-opacity-90 text-white">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

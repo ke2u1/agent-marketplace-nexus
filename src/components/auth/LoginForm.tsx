@@ -1,14 +1,17 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const LoginForm = () => {
   const { toast } = useToast();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -18,21 +21,52 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      // In a real app, this would call an authentication API
-      console.log("Login attempt with:", { email, password });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For now, just show success and redirect would happen after Supabase integration
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to AgentMarket!",
-      });
+      await signIn(email, password);
+      navigate("/dashboard");
     } catch (error) {
+      // Error handling is done in the AuthContext
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: "Please check your credentials and try again.",
+        title: "Google login failed",
+        description: error.message || "An error occurred during Google sign in.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleFacebookSignIn = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Facebook login failed",
+        description: error.message || "An error occurred during Facebook sign in.",
         variant: "destructive",
       });
     } finally {
@@ -102,7 +136,7 @@ const LoginForm = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button" disabled={isLoading}>
+              <Button variant="outline" type="button" disabled={isLoading} onClick={handleGoogleSignIn}>
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -123,7 +157,7 @@ const LoginForm = () => {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" type="button" disabled={isLoading}>
+              <Button variant="outline" type="button" disabled={isLoading} onClick={handleFacebookSignIn}>
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
                 </svg>

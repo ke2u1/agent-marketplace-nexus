@@ -1,15 +1,19 @@
 
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const SignupForm = () => {
   const { toast } = useToast();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isDeveloper = searchParams.get("developer") === "true";
   
@@ -55,20 +59,53 @@ const SignupForm = () => {
     setIsLoading(true);
 
     try {
-      // In a real app, this would call an authentication API
-      console.log("Signup attempt with:", formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Account Created Successfully",
-        description: "Welcome to AgentMarket!",
-      });
+      await signUp(formData.email, formData.password, formData.name, formData.isDeveloper);
+      // Redirect to dashboard or login page after successful signup
+      navigate("/login");
     } catch (error) {
+      // Error handling is done in the AuthContext
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
       toast({
-        title: "Signup Failed",
-        description: "There was an error creating your account.",
+        title: "Google signup failed",
+        description: error.message || "An error occurred during Google sign up.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleFacebookSignUp = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Facebook signup failed",
+        description: error.message || "An error occurred during Facebook sign up.",
         variant: "destructive",
       });
     } finally {
@@ -196,7 +233,7 @@ const SignupForm = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button" disabled={isLoading}>
+              <Button variant="outline" type="button" disabled={isLoading} onClick={handleGoogleSignUp}>
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -217,7 +254,7 @@ const SignupForm = () => {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" type="button" disabled={isLoading}>
+              <Button variant="outline" type="button" disabled={isLoading} onClick={handleFacebookSignUp}>
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
                 </svg>
