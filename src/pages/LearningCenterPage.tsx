@@ -7,8 +7,27 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
 
+// Define types for our news data
+interface NewsItem {
+  id: number;
+  title: string;
+  source: string;
+  date: string;
+  summary: string;
+  url: string;
+}
+
+// Define types for learning resources
+interface LearningResource {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  level: string;
+}
+
 // Mock news data - in a real app, this would come from an API
-const mockNews = [
+const mockNews: NewsItem[] = [
   {
     id: 1,
     title: "OpenAI Announces New Agent Framework",
@@ -36,7 +55,7 @@ const mockNews = [
 ];
 
 // Mock learning resources
-const learningResources = [
+const learningResources: LearningResource[] = [
   {
     id: 1,
     title: "What are AI Agents?",
@@ -68,21 +87,21 @@ const learningResources = [
 ];
 
 // Mock function to fetch news from an API
-const fetchLatestNews = async () => {
+const fetchLatestNews = async (): Promise<NewsItem[]> => {
   // In a real implementation, this would be an API call
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(mockNews);
     }, 1000);
-  }).then(data => data);
+  });
 };
 
 const LearningCenterPage = () => {
   const [selectedLevel, setSelectedLevel] = useState("beginner");
 
-  const { data: news, isLoading: isLoadingNews } = useQuery({
+  const { data: news, isLoading: isLoadingNews } = useQuery<NewsItem[]>({
     queryKey: ['agentNews'],
-    queryFn: () => fetchLatestNews()
+    queryFn: fetchLatestNews
   });
 
   const filteredResources = learningResources.filter(
