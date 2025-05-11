@@ -15,6 +15,8 @@ import AboutPage from "./pages/AboutPage";
 import PricingPage from "./pages/PricingPage";
 import ForDevelopersPage from "./pages/ForDevelopersPage";
 import DashboardPage from "./pages/DashboardPage";
+import LearningCenterPage from "./pages/LearningCenterPage";
+import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/for-developers" element={<ForDevelopersPage />} />
+            <Route path="/learning-center" element={<LearningCenterPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route 
               path="/dashboard/*" 
               element={

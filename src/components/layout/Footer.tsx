@@ -67,6 +67,11 @@ const Footer = () => {
                   For Developers
                 </Link>
               </li>
+              <li>
+                <Link to="/learning-center" className="text-gray-300 hover:text-white">
+                  Learning Center
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

@@ -54,8 +54,11 @@ const Navbar = () => {
               <Link to="/pricing" className="text-gray-600 hover:text-marketplace-primary transition-colors">
                 Pricing
               </Link>
-              <Link to="/about" className="text-gray-600 hover:text-marketplace-primary transition-colors">
-                About
+              <Link to="/for-developers" className="text-gray-600 hover:text-marketplace-primary transition-colors">
+                For Developers
+              </Link>
+              <Link to="/learning-center" className="text-gray-600 hover:text-marketplace-primary transition-colors">
+                Learning Center
               </Link>
             </div>
           </div>
@@ -161,11 +164,18 @@ const Navbar = () => {
                 Pricing
               </Link>
               <Link
-                to="/about"
+                to="/for-developers"
                 className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About
+                For Developers
+              </Link>
+              <Link
+                to="/learning-center"
+                className="px-2 py-1 text-gray-600 hover:text-marketplace-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Learning Center
               </Link>
               {user ? (
                 <>

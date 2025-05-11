@@ -73,6 +73,36 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-['Inter'];
+  }
+}
+
+@layer components {
+  .marketplace-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .marketplace-button-primary {
+    @apply bg-marketplace-secondary hover:bg-opacity-90 text-white font-semibold py-2 px-4 rounded-md transition-all;
+  }
+  
+  .marketplace-button-secondary {
+    @apply bg-white border border-marketplace-secondary text-marketplace-secondary hover:bg-marketplace-secondary hover:text-white font-semibold py-2 px-4 rounded-md transition-all;
+  }
+  
+  .marketplace-card {
+    @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden;
+  }
+  
+  .marketplace-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-marketplace-accent;
+  }
+  
+  .marketplace-heading {
+    @apply text-marketplace-primary font-bold;
+  }
+  
+  .marketplace-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
 }
